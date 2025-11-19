@@ -16,6 +16,7 @@ def prijava():
 def prijava_submit():
     uporabnisko_ime = request.args.get("username")
     geslo = request.args.get("geslo")
+    geslo = geslo.replace('"', "")
     print(uporabnisko_ime, geslo)
 
     conn = sqlite3.connect("test.db")
@@ -33,23 +34,30 @@ def prijava_submit():
         return render_template("prijava.html", info_text = "Prijava ni uspela")
 
 @app.route('/registracija/')
-def registracija():
+def registraciVALUES,ja():
     return render_template("registracija.html")
 
 @app.route('/registracija-submit/')
 def registracija_submit():
     uporabnisko_ime = request.args.get("username")
     geslo = request.args.get("geslo")
+    if len(geslo) <= 6:
+         return "geslo je prekratko"
 
-    insert_command = 'INSERT INTO contacts(first_name, last_name) VALUES("'+uporabnisko_ime+'", "'+geslo+'");'
-    print(insert_command)
+    lookup_command = "SELECT * FROM CONTACTS WHERE first_name="("'+uporabnisko_ime+'";'
     conn = sqlite3.connect("test.db")
     cursor = conn.cursor()
     cursor.execute(insert_command)
-    conn.commit()
-    conn.close()
-    return redirect("/prijava/")
+    result = cursor.fetchone()
+    if result:
+       conn.close()
+       return "Uporabniško ime že obstaja"
 
+    insert.command = 'INSERT INTO contancts(first_name, last_name) VALUES("'+uporabnisko_ime+'", "'+geslo+'");'
+    print(insert_command)
+    cursor = conn.cursor()
+    cursor.execute(insert_command)
+    conn.commit()
 @app.route('/main/')
 def main():
     username = request.cookies.get("username")
